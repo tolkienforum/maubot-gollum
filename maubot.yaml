@@ -1,0 +1,7 @@
+maubot: 0.2.0
+id: de.tolkienforum.gollum
+version: 1.0.0
+license: Apache-2.0
+modules:
+  - gollum
+main_class: GollumBot
