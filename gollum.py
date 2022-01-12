@@ -29,6 +29,11 @@ class GollumBot(Plugin):
     async def maeh(self, evt: MessageEvent) -> None:
         await self.client.send_markdown(evt.room_id, "__Mas Tequila!!__")
 
+    @command.new(name="wm")
+    async def wm(self, evt: MessageEvent) -> None:
+        await self.client.kick_user(evt.room_id, evt.sender, "hat wm gesagt!")
+        await self.client.send_text(evt.room_id, "Fizzzzzz " + evt.sender + " ist weg!")
+
     @command.new(name="lion")
     async def lion(self, evt: MessageEvent) -> None:
         await evt.reply("Löwe kommt!")
