@@ -31,8 +31,11 @@ class GollumBot(Plugin):
 
     @command.new(name="wm")
     async def wm(self, evt: MessageEvent) -> None:
-        await self.client.kick_user(evt.room_id, evt.sender, "hat wm gesagt!")
-        await self.client.send_text(evt.room_id, "Fizzzzzz " + evt.sender + " ist weg!")
+        if evt.sender.startswith("@wm:"):
+            await evt.reply("Neeee lassma!")
+        else:
+            await self.client.kick_user(evt.room_id, evt.sender, "hat wm gesagt!")
+            await self.client.send_text(evt.room_id, "Fizzzzzz " + evt.sender + " ist weg!")
 
     @command.new(name="lion")
     async def lion(self, evt: MessageEvent) -> None:
@@ -48,6 +51,10 @@ class GollumBot(Plugin):
     async def rooofy(self, evt: MessageEvent) -> None:
         await evt.reply("Rooofy! Yeah! Sofort!")
         await self.send_image(evt.room_id, "https://www.tolkienforum.de/stuff/botme/roofys.php", "rooofy")
+
+    @command.new(name="geist")
+    async def geist(self, evt: MessageEvent) -> None:
+        await self.send_image(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_5.gif", "geist")
 
     async def send_image(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
         current_time = str(datetime.now().microsecond)
