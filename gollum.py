@@ -1,6 +1,6 @@
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command
-from mautrix.types import RoomID
+from mautrix.types import RoomID, ImageInfo
 from datetime import datetime
 
 
@@ -54,7 +54,7 @@ class GollumBot(Plugin):
 
     @command.new(name="geist")
     async def geist(self, evt: MessageEvent) -> None:
-        await self.send_image(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_5.gif", "geist")
+        await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_5.gif", "geist")
 
     async def send_image(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
         current_time = str(datetime.now().microsecond)
@@ -66,5 +66,17 @@ class GollumBot(Plugin):
         data = await resp.read()
         uri = await self.client.upload_media(data)
         self.log.info(f"read image from {url} and uploaded it to {uri}")
-
         await self.client.send_image(room_id, url=uri, file_name=file_name_prefix + "-" + current_time)
+
+    async def send_gif(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
+        async with self.http.get(url) as response:
+            data = await response.read()
+            uri = await self.client.upload_media(data, mime_type="image/gif")
+            await self.client.send_image(
+                room_id,
+                url=uri,
+                file_name=file_name_prefix,
+                info=ImageInfo(
+                    mimetype="image/gif"
+                )
+            )
