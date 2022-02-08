@@ -56,6 +56,10 @@ class GollumBot(Plugin):
     async def geist(self, evt: MessageEvent) -> None:
         await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_5.gif", "geist")
 
+    @command.new(name="knuddel")
+    async def knuddel(self, evt: MessageEvent) -> None:
+        await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_smilie_20.gif", "knuddel")
+
     async def send_image(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
         current_time = str(datetime.now().microsecond)
         resp = await self.http.get(url + "?t=" + current_time)
