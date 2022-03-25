@@ -1,10 +1,12 @@
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command
 from mautrix.types import RoomID, ImageInfo
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class GollumBot(Plugin):
+
+    lastPeeksDate: datetime = datetime(2000, 1, 1)
 
     @command.new(name="beleidige", aliases=["b"])
     @command.argument("names", pass_raw=True, required=False)
@@ -34,8 +36,11 @@ class GollumBot(Plugin):
         if evt.sender.startswith("@wm:"):
             await evt.reply("Neeee lassma!")
         else:
+            display_name = await self.client.get_displayname(evt.sender)
+            html = "Fizzzzzz! <a href='https://matrix.to/#/" + evt.sender + "'>" + display_name + "</a> ist weg!!"
+            text = "Fizzzzzz! " + display_name + " ist weg!!"
+            await self.client.send_text(evt.room_id, text, html)
             await self.client.kick_user(evt.room_id, evt.sender, "hat wm gesagt!")
-            await self.client.send_text(evt.room_id, "Fizzzzzz " + evt.sender + " ist weg!")
 
     @command.new(name="lion")
     async def lion(self, evt: MessageEvent) -> None:
@@ -59,6 +64,23 @@ class GollumBot(Plugin):
     @command.new(name="knuddel")
     async def knuddel(self, evt: MessageEvent) -> None:
         await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_smilie_20.gif", "knuddel")
+
+    @command.new(name="peeks")
+    async def peeks(self, evt: MessageEvent) -> None:
+        if evt.sender.startswith("@wm:"):
+            await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/emoticons/peeks.gif", "peeks")
+        elif evt.sender.startswith("@perianwen:"):
+            self.lastPeeksDate = datetime.now()
+            display_name = await self.client.get_displayname(evt.sender)
+            html = "Peekse für alle! Von der freundlichen Backstübli-Inhaberin <a href='https://matrix.to/#/" \
+                   + evt.sender + "'>" + display_name + "</a>!!"
+            text = "Peekse für alle! Von der freundlichen Backstübli-Inhaberin " + display_name + "!!"
+            await self.client.send_text(evt.room_id, text, html)
+            await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_17.gif", "anbet")
+        elif datetime.now() < self.lastPeeksDate + timedelta(minutes=5):
+            await evt.reply("Super Duper Peeks! Von Pee!! Schön Danke sagen!!!")
+        else:
+            await evt.reply("Gibt grad keine Peekse!")
 
     async def send_image(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
         current_time = str(datetime.now().microsecond)

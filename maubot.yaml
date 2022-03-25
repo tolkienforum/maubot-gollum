@@ -1,6 +1,6 @@
 maubot: 0.2.0
 id: de.tolkienforum.gollum
-version: 1.0.15
+version: 1.0.22
 license: Apache-2.0
 modules:
   - gollum
