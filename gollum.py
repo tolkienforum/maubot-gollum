@@ -1,6 +1,6 @@
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command
-from mautrix.types import RoomID, ImageInfo
+from mautrix.types import RoomID, ImageInfo, RelatesTo, RelationType, MediaMessageEventContent, MessageType
 from datetime import datetime, timedelta
 
 
@@ -67,9 +67,7 @@ class GollumBot(Plugin):
 
     @command.new(name="peeks")
     async def peeks(self, evt: MessageEvent) -> None:
-        if evt.sender.startswith("@wm:"):
-            await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/emoticons/peeks.gif", "peeks")
-        elif evt.sender.startswith("@perianwen:"):
+        if evt.sender.startswith("@perianwen:"):
             self.lastPeeksDate = datetime.now()
             display_name = await self.client.get_displayname(evt.sender)
             html = "Peekse für alle! Von der freundlichen Backstübli-Inhaberin <a href='https://matrix.to/#/" \
@@ -77,8 +75,21 @@ class GollumBot(Plugin):
             text = "Peekse für alle! Von der freundlichen Backstübli-Inhaberin " + display_name + "!!"
             await self.client.send_text(evt.room_id, text, html)
             await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_17.gif", "anbet")
-        elif datetime.now() < self.lastPeeksDate + timedelta(minutes=5):
-            await evt.reply("Super Duper Peeks! Von Pee!! Schön Danke sagen!!!")
+        elif datetime.now() < self.lastPeeksDate + timedelta(minutes=4):
+            async with self.http.get("https://www.tolkienforum.de/uploads/emoticons/peeks.gif") as response:
+                await evt.reply("Super Duper Peeks! Von Pee!! Schön Danke sagen!!!")
+                data = await response.read()
+                uri = await self.client.upload_media(data, mime_type="image/gif")
+                await evt.reply(
+                    content=MediaMessageEventContent(
+                        msgtype=MessageType.IMAGE,
+                        url=uri,
+                        info=ImageInfo(
+                            mimetype="image/gif"
+                        )
+                    )
+                )
+                # await self.reply_with_gif(evt, "https://www.tolkienforum.de/uploads/emoticons/peeks.gif", "peeks")
         else:
             await evt.reply("Gibt grad keine Peekse!")
 
@@ -104,5 +115,22 @@ class GollumBot(Plugin):
                 file_name=file_name_prefix,
                 info=ImageInfo(
                     mimetype="image/gif"
+                )
+            )
+
+    async def reply_with_gif(self, evt: MessageEvent, url: str, file_name_prefix: str) -> None:
+        async with self.http.get(url) as response:
+            data = await response.read()
+            uri = await self.client.upload_media(data, mime_type="image/gif")
+            await self.client.send_image(
+                evt.room_id,
+                url=uri,
+                file_name=file_name_prefix,
+                info=ImageInfo(
+                    mimetype="image/gif"
+                ),
+                relates_to=RelatesTo(
+                    rel_type=RelationType.REPLY,
+                    event_id=evt.event_id
                 )
             )
