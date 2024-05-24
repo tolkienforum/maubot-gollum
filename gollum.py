@@ -57,6 +57,12 @@ class GollumBot(Plugin):
         await evt.reply("Rooofy! Yeah! Sofort!")
         await self.send_image(evt.room_id, "https://www.tolkienforum.de/stuff/botme/roofys.php", "rooofy")
 
+    @command.new(name="uuursi")
+    async def uuursi(self, evt: MessageEvent) -> None:
+        await evt.reply("Grossartig! Kommt sofort!")
+        await self.send_image(evt.room_id, "https://www.tolkienforum.de/stuff/botme/uuursis.php", "uuursi")
+
+
     @command.new(name="geist")
     async def geist(self, evt: MessageEvent) -> None:
         await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_5.gif", "geist")
