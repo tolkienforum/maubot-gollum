@@ -3,7 +3,6 @@ from maubot.handlers import command
 from mautrix.types import RoomID, ImageInfo, RelatesTo, RelationType, MediaMessageEventContent, MessageType
 from datetime import datetime, timedelta
 
-
 class GollumBot(Plugin):
 
     lastPeeksDate: datetime = datetime(2000, 1, 1)
@@ -95,7 +94,6 @@ class GollumBot(Plugin):
                         )
                     )
                 )
-                # await self.reply_with_gif(evt, "https://www.tolkienforum.de/uploads/emoticons/peeks.gif", "peeks")
         else:
             await evt.reply("Gibt grad keine Peekse!")
 
@@ -107,36 +105,24 @@ class GollumBot(Plugin):
             return None
 
         data = await resp.read()
+        resp_uri = str(resp.url)
+        filename = resp_uri.rsplit('/', 1)[-1]
         uri = await self.client.upload_media(data)
         self.log.info(f"read image from {url} and uploaded it to {uri}")
-        await self.client.send_image(room_id, url=uri, file_name=file_name_prefix + "-" + current_time)
+        await self.client.send_image(room_id, url=uri, file_name=file_name_prefix + "-" + current_time + "-" + filename)
 
     async def send_gif(self, room_id: RoomID, url: str, file_name_prefix: str) -> None:
         async with self.http.get(url) as response:
             data = await response.read()
+            resp_uri = str(response.url)
+            filename = resp_uri.rsplit('/', 1)[-1]
+
             uri = await self.client.upload_media(data, mime_type="image/gif")
             await self.client.send_image(
                 room_id,
                 url=uri,
-                file_name=file_name_prefix,
+                file_name=file_name_prefix + "-" + filename,
                 info=ImageInfo(
                     mimetype="image/gif"
-                )
-            )
-
-    async def reply_with_gif(self, evt: MessageEvent, url: str, file_name_prefix: str) -> None:
-        async with self.http.get(url) as response:
-            data = await response.read()
-            uri = await self.client.upload_media(data, mime_type="image/gif")
-            await self.client.send_image(
-                evt.room_id,
-                url=uri,
-                file_name=file_name_prefix,
-                info=ImageInfo(
-                    mimetype="image/gif"
-                ),
-                relates_to=RelatesTo(
-                    rel_type=RelationType.REPLY,
-                    event_id=evt.event_id
                 )
             )
