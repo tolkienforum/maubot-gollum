@@ -2,3 +2,5 @@ virtualenv/
 .idea/
 
 *.mbp
+
+.DS_Store

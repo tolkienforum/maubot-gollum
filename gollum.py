@@ -81,19 +81,8 @@ class GollumBot(Plugin):
             await self.client.send_text(evt.room_id, text, html)
             await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/default_pf_hsmilie_17.gif", "anbet")
         elif datetime.now() < self.lastPeeksDate + timedelta(minutes=4):
-            async with self.http.get("https://www.tolkienforum.de/uploads/emoticons/peeks.gif") as response:
-                await evt.reply("Super Duper Peeks! Von Pee!! Schön Danke sagen!!!")
-                data = await response.read()
-                uri = await self.client.upload_media(data, mime_type="image/gif")
-                await evt.reply(
-                    content=MediaMessageEventContent(
-                        msgtype=MessageType.IMAGE,
-                        url=uri,
-                        info=ImageInfo(
-                            mimetype="image/gif"
-                        )
-                    )
-                )
+            await evt.reply("Super Duper Peeks! Von Pee!! Schön Danke sagen!!!")
+            await self.send_gif(evt.room_id, "https://www.tolkienforum.de/uploads/emoticons/peeks.gif", "peeks")
         else:
             await evt.reply("Gibt grad keine Peekse!")
 
